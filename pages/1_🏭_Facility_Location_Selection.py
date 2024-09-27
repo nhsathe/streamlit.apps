@@ -88,7 +88,7 @@ def create_model(distances, P, objective_type):
     return model
 
 def main():
-    st.title("Facility Location Optimization")
+    st.title("🏭 Facility Location Selection")
 
     # Load default data
     file = 'Database.csv'
