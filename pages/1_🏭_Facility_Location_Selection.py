@@ -116,7 +116,7 @@ def main():
     st.dataframe(dist_mat)
 
     # Select number of support centers and objective function
-    P = st.slider("Select number of support centers to be built", min_value=1, max_value=num_locations + 1 , value=3)
+    P = st.slider("Select number of support centers to be built", min_value=1, max_value=len(dist_mat) + 1 , value=3)
     objective_type = st.selectbox(
         "Select objective function",
         options=['P-Median', 'K-Center', 'MCLP']
