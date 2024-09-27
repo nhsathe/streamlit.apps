@@ -1,0 +1,11 @@
+name: pyomo_env
+channels:
+  - conda-forge
+dependencies:
+  - python=3.9
+  - pyomo
+  - glpk
+  - pip
+  - pulp
+  - plotly
+  
