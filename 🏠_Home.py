@@ -5,7 +5,8 @@ st.set_page_config(
     page_icon="👋",
 )
 
-st.write("# Welcome to Nishank's Streamlit! 👋")
+st.write("# Welcome to Nishank's Streamlit!")
+st.subheader("Projects", divider="gray")
 st.page_link("pages/1_🏭_Facility_Location_Selection.py", label="Facility Location Selection", icon="🏭")
 
 
