@@ -42,7 +42,6 @@ footer = """
         <a href="mailto:nsathe@clemson.edu">
             <i class="fa fa-envelope"></i>
         </a>
-        <p>Powered by Streamlit &copy; 2024</p>
     </div>
 
     <!-- Load Font Awesome -->
