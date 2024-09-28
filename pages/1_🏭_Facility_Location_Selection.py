@@ -12,7 +12,7 @@ import pandas as pd
 import numpy as np
 import streamlit as st
 import plotly.graph_objects as go
-from 🏠_Home.py import footer
+from Home.py import footer
 
 # Function to calculate spherical distance
 def spherical_dist(pos1, pos2, r=3958.75):
