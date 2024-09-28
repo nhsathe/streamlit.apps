@@ -200,7 +200,7 @@ def main():
         st.plotly_chart(fig)
 
         st.write(f"```\n{results}\n```")
-
+        st.markdown(footer, unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
