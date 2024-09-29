@@ -157,7 +157,7 @@ def main():
 
         # Prepare data for visualization
         result_data = edited_data[edited_data['zip_code'].isin(support_centers)]
-        st.dataframe(result_data)
+        
         fig = go.Figure()
 
         # Add scatter points for support centers
@@ -166,13 +166,14 @@ def main():
             lon=result_data['longitude'],
             mode='markers',
             marker=dict(size=10, color='blue'),
-            text=result_data['zip_code'],
+            hovertext=result_data['zip_code'],
+            hoverinfo='text',
             name='Support Centers'
         ))
 
         # Add scatter points for other locations
         other_data = edited_data[~edited_data['zip_code'].isin(support_centers)]
-        st.dataframe(other_data)
+        
         fig.add_trace(go.Scattermapbox(
             lat=other_data['latitude'],
             lon=other_data['longitude'],
