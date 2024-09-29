@@ -157,6 +157,7 @@ def main():
 
         # Prepare data for visualization
         result_data = edited_data[edited_data['zip_code'].isin(support_centers)]
+        st.dataframe(result_data)
         fig = go.Figure()
 
         # Add scatter points for support centers
