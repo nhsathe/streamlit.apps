@@ -179,7 +179,8 @@ def main():
             lon=other_data['longitude'],
             mode='markers',
             marker=dict(size=8, color='red'),
-            text=other_data['zip_code'],
+            hovertext=other_data['zip_code'],
+            hoverinfo='text',
             name='Served Locations'
         ))
 
