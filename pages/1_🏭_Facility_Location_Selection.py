@@ -53,6 +53,9 @@ def create_model(distances, P, objective_type):
     model.x = pyo.Var(model.I, model.J, within=pyo.Binary)
     model.y = pyo.Var(model.I, within=pyo.Binary)
     model.d = pyo.Param(model.I, model.J, initialize=lambda model, i, j: distances.iloc[i-1, j-1])
+
+    # Introduce z_max for K-Center
+    model.z_max = pyo.Var(within=pyo.NonNegativeReals)  # Maximum distance to be minimized
     
     # Objective functions
     if objective_type == 'P-Median':
@@ -62,7 +65,7 @@ def create_model(distances, P, objective_type):
         )
     elif objective_type == 'K-Center':
         model.objective = pyo.Objective(
-            expr=sum(model.x[i, j] * model.d[i, j] for i in model.I for j in model.J),
+            expr=model.z_max),
             sense=pyo.minimize
         )
     elif objective_type == 'MCLP':
@@ -85,6 +88,14 @@ def create_model(distances, P, objective_type):
         model.I, model.J,
         rule=lambda model, i, j: model.x[i, j] <= model.y[i]
     )
+
+    # Additional constraints for K-Center:
+    if objective_type == 'K-Center':
+        # Constrain maximum distance to be greater than or equal to the distance between any assigned location and support center
+        model.max_distance_constraint = pyo.Constraint(
+            model.I, model.J,
+            rule=lambda model, i, j: model.z_max >= model.x[i, j] * model.d[i, j]
+        )
     
     return model
 
