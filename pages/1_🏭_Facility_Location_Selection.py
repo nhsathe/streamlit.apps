@@ -172,6 +172,7 @@ def main():
 
         # Add scatter points for other locations
         other_data = edited_data[~edited_data['zip_code'].isin(support_centers)]
+        st.dataframe(other_data)
         fig.add_trace(go.Scattermapbox(
             lat=other_data['latitude'],
             lon=other_data['longitude'],
