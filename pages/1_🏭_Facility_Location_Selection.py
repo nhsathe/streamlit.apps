@@ -65,7 +65,7 @@ def create_model(distances, P, objective_type):
         )
     elif objective_type == 'K-Center':
         model.objective = pyo.Objective(expr=model.z_max, sense=pyo.minimize)
-        )
+        
     elif objective_type == 'MCLP':
         model.objective = pyo.Objective(
             expr=sum(model.x[i, j] * model.d[i, j] for i in model.I for j in model.J),
