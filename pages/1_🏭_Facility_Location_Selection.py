@@ -121,16 +121,18 @@ def main():
 
 
 
-    # Check column names for compatibility
-    if 'zip_code' not in edited_data.columns or 'latitude' not in edited_data.columns or 'longitude' not in edited_data.columns:
-        st.error("CSV file must contain 'zip_code', 'latitude', and 'longitude' columns.")
+   # Check column names for compatibility
+    required_columns = ['zip_code', 'population', 'latitude', 'longitude']
+    if not all(col in edited_data.columns for col in required_columns):
+        st.error("CSV file must contain 'zip_code','population', 'latitude' and 'longitude' columns.")
         return
 
     # Convert edited DataFrame to lists for optimization model
     Zipcode1 = edited_data['zip_code'].tolist()
     latitude1 = edited_data['latitude'].tolist()
     longitude1 = edited_data['longitude'].tolist()
-
+    population = edited_data['population'].tolist()
+    
     # Calculate distance matrix
     dist_mat = calculate_distances(edited_data)
     st.write("Calculated distance matrix:")
