@@ -166,7 +166,7 @@ def main():
             lon=result_data['longitude'],
             mode='markers',
             marker=dict(size=10, color='blue'),
-            hovertext=result_data['zip_code'],
+            hovertext=result_data['zip_code'].astype(str),
             hoverinfo='text',
             name='Support Centers'
         ))
