@@ -103,7 +103,7 @@ def create_model(distances, population, P, objective_type, r_max=None):
     if objective_type == 'MCLP':
         model.coverage_constraint = pyo.Constraint(
         model.J,  
-        rule=lambda model, j: sum(model.x[i, j] for i in model.I if model.d[i, j] <= r_max) >= 1
+        rule=lambda model, j: sum(model.x[i, j] for i in model.I if model.d[i, j] <= r_max) >= model.y[j]
         )
 
 
