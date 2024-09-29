@@ -43,7 +43,8 @@ def calculate_distances(data):
     return dist_mat
 
 # Create model with different objectives
-def create_model(distances, P, objective_type):
+#def create_model(distances, P, objective_type):
+def create_model(distances, population, P, objective_type, r_max=None):    
     num_locations = len(distances)
     model = pyo.ConcreteModel(name="Support Center Optimization")
     
@@ -53,9 +54,11 @@ def create_model(distances, P, objective_type):
     model.x = pyo.Var(model.I, model.J, within=pyo.Binary)
     model.y = pyo.Var(model.I, within=pyo.Binary)
     model.d = pyo.Param(model.I, model.J, initialize=lambda model, i, j: distances.iloc[i-1, j-1])
-
+    
     # Introduce z_max for K-Center
     model.z_max = pyo.Var(within=pyo.NonNegativeReals)  # Maximum distance to be minimized
+    
+    model.population = pyo.Param(model.I, initialize=lambda model, i: population[i-1]) 
     
     # Objective functions
     if objective_type == 'P-Median':
@@ -68,7 +71,7 @@ def create_model(distances, P, objective_type):
         
     elif objective_type == 'MCLP':
         model.objective = pyo.Objective(
-            expr=sum(model.x[i, j] * model.d[i, j] for i in model.I for j in model.J),
+            expr=sum(model.x[i, j] * model.population[j] for i in model.I for j in model.J),
             sense=pyo.maximize
         )
     
@@ -93,6 +96,14 @@ def create_model(distances, P, objective_type):
         model.max_distance_constraint = pyo.Constraint(
             model.I, model.J,
             rule=lambda model, i, j: model.z_max >= model.x[i, j] * model.d[i, j]
+        )
+
+    # Additional constraints for MCLP:
+    if objective_type == 'MCLP':
+        # Ensure that assignments can only occur within the coverage radius (r_max)
+        model.coverage_constraint = pyo.Constraint(
+            model.I, model.J,
+            rule=lambda model, i, j: model.x[i, j] <= (model.d[i, j] <= r_max)
         )
     
     return model
@@ -132,9 +143,15 @@ def main():
         options=['P-Median', 'K-Center', 'MCLP']
     )
 
+    # Allow the user to set the maximum coverage radius for MCLP
+    if objective_type == 'MCLP':
+        r_max = st.slider("Select maximum coverage radius (miles)", min_value=1, max_value=int(dist_mat.max().max()), value=5)
+    else:
+        r_max = None  # No need for r_max in other objective types
+        
     # Run the model
     if st.button("Run Model"):
-        model = create_model(dist_mat, P, objective_type)
+        model = create_model(dist_mat, population, P, objective_type, r_max)
         solver = pyo.SolverFactory('glpk')
 
         # Ensure the solver is correctly applied
