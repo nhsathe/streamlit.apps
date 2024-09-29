@@ -177,7 +177,7 @@ def main():
             mode='markers',
             marker=dict(size=8, color='red'),
             text=other_data['zip_code'],
-            name='Other Locations'
+            name='Served Locations'
         ))
 
         # Add arcs connecting locations to their assigned support centers
@@ -190,8 +190,8 @@ def main():
                     lat=[sc_lat, loc_lat],
                     lon=[sc_lon, loc_lon],
                     mode='lines',
-                    line=dict(width=2, color='black'),
-                    name=f'Cost: {distance:.2f}'
+                    line=dict(width=1, color='black'),
+                    name=f'Distance: {distance:.2f} miles'
                 ))
 
         average_lat = edited_data['latitude'].mean()
