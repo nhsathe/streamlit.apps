@@ -99,13 +99,13 @@ def create_model(distances, population, P, objective_type, r_max=None):
         )
 
     # Additional constraints for MCLP:
+    # Coverage constraint for MCLP
     if objective_type == 'MCLP':
-        # Ensure that assignments can only occur within the coverage radius (r_max)
         model.coverage_constraint = pyo.Constraint(
-            model.I, model.J,
-            rule=lambda model, i, j: model.x[i, j] <= (model.d[i, j] <= r_max)
+        model.I, model.J,
+        rule=lambda model, i, j: model.x[i, j] <= (model.d[i, j] <= r_max)
         )
-    
+
     return model
 
 def main():
