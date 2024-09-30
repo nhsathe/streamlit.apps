@@ -35,21 +35,22 @@ def calculate_distances(data):
     dist_mat = spherical_dist_matrix(coordinates)
     return pd.DataFrame(dist_mat, index=data['zip_code'], columns=data['zip_code'])
 
-# Create model with different objectives
-def create_model(distances, population, P, objective_type, r_max=None):
+def create_model(distances, population, P, objective_type, r_max=None):    
     num_locations = len(distances)
     model = pyo.ConcreteModel(name="Support Center Optimization")
     
-    model.I = pyo.Set(initialize=range(num_locations))
-    model.J = pyo.Set(initialize=range(num_locations))
+    model.I = pyo.Set(initialize=range(1, num_locations + 1))
+    model.J = pyo.Set(initialize=range(1, num_locations + 1))
     
     model.x = pyo.Var(model.I, model.J, within=pyo.Binary)
     model.y = pyo.Var(model.I, within=pyo.Binary)
-    model.d = pyo.Param(model.I, model.J, initialize=lambda model, i, j: distances.iloc[i, j])
+    model.d = pyo.Param(model.I, model.J, initialize=lambda model, i, j: distances.iloc[i-1, j-1])
     
+    # Introduce z_max for K-Center
     model.z_max = pyo.Var(within=pyo.NonNegativeReals)  # Maximum distance to be minimized
-    model.population = pyo.Param(model.I, initialize=lambda model, i: population[i]) 
-
+    
+    model.population = pyo.Param(model.I, initialize=lambda model, i: population[i-1]) 
+    
     # Objective functions
     if objective_type == 'P-Median':
         model.objective = pyo.Objective(
@@ -58,6 +59,7 @@ def create_model(distances, population, P, objective_type, r_max=None):
         )
     elif objective_type == 'K-Center':
         model.objective = pyo.Objective(expr=model.z_max, sense=pyo.minimize)
+        
     elif objective_type == 'MCLP':
         model.objective = pyo.Objective(
             expr=sum(model.x[i, j] * model.population[j] for i in model.I for j in model.J),
@@ -102,25 +104,18 @@ def main():
     file = 'Database.csv'
     data = load_data(file)
 
-    # Allow users to edit the data
-    st.write("Input data:")
-    edited_data = data
-    st.dataframe(edited_data.head(100))
-
     # Check column names for compatibility
     required_columns = ['zip_code', 'population', 'latitude', 'longitude']
-    if not all(col in edited_data.columns for col in required_columns):
-        st.error("CSV file must contain 'zip_code','population', 'latitude' and 'longitude' columns.")
+    if not all(col in data.columns for col in required_columns):
+        st.error("CSV file must contain 'zip_code', 'population', 'latitude' and 'longitude' columns.")
         return
 
-    # Convert edited DataFrame to lists for optimization model
-    Zipcode1 = edited_data['zip_code'].tolist()
-    population = edited_data['population'].tolist()
-    
+    # Convert filtered DataFrame to lists for optimization model
+    Zipcode1 = data['zip_code'].tolist()
+    population = data['population'].tolist()
+
     # Calculate distance matrix
-    dist_mat = calculate_distances(edited_data)
-    st.write("Calculated distance matrix:")
-    st.dataframe(dist_mat.head(100))
+    dist_mat = calculate_distances(data)
 
     # Select number of support centers and objective function
     P = st.number_input("Select number of support centers to be built", min_value=1, max_value=len(dist_mat), value=3)
@@ -149,7 +144,7 @@ def main():
             return
 
         # Extract results
-        support_centers = [Zipcode1[i] for i in model.I if pyo.value(model.y[i]) == 1]
+        support_centers = [Zipcode1[i - 1] for i in model.I if pyo.value(model.y[i]) == 1]
         assignments = {zipcode: [] for zipcode in support_centers}
 
         # Display support centers
@@ -159,7 +154,7 @@ def main():
         for i in model.I:
             for j in model.J:
                 if pyo.value(model.x[i, j]) == 1:
-                    assignments[Zipcode1[i]].append(Zipcode1[j])
+                    assignments[Zipcode1[i - 1]].append(Zipcode1[j - 1])
 
         # Display allocations
         st.write("Allocations:")
@@ -167,7 +162,7 @@ def main():
         st.dataframe(assignment_df)
 
         # Prepare data for visualization
-        result_data = edited_data[edited_data['zip_code'].isin(support_centers)]
+        result_data = data[data['zip_code'].isin(support_centers)]
         
         fig = go.Figure()
 
@@ -183,7 +178,7 @@ def main():
         ))
 
         # Add scatter points for other locations
-        other_data = edited_data[~edited_data['zip_code'].isin(support_centers)]
+        other_data = data[~data['zip_code'].isin(support_centers)]
         
         fig.add_trace(go.Scattermapbox(
             lat=other_data['latitude'],
@@ -197,9 +192,9 @@ def main():
 
         # Add arcs connecting locations to their assigned support centers
         for sc, locs in assignments.items():
-            sc_lat, sc_lon = edited_data[edited_data['zip_code'] == sc][['latitude', 'longitude']].values[0]
+            sc_lat, sc_lon = data[data['zip_code'] == sc][['latitude', 'longitude']].values[0]
             for loc in locs:
-                loc_lat, loc_lon = edited_data[edited_data['zip_code'] == loc][['latitude', 'longitude']].values[0]
+                loc_lat, loc_lon = data[data['zip_code'] == loc][['latitude', 'longitude']].values[0]
                 distance = spherical_dist_matrix(np.array([[sc_lat, sc_lon], [loc_lat, loc_lon]]))
                 fig.add_trace(go.Scattermapbox(
                     lat=[sc_lat, loc_lat],
@@ -210,8 +205,8 @@ def main():
                 ))
 
         # Set the map center and layout
-        average_lat = edited_data['latitude'].mean()
-        average_lon = edited_data['longitude'].mean()
+        average_lat = data['latitude'].mean()
+        average_lon = data['longitude'].mean()
         fig.update_layout(
             mapbox_style="open-street-map",
             height=800,
