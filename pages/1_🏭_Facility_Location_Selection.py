@@ -37,8 +37,8 @@ def calculate_distances(data):
     for i in range(num_locations):
         for j in range(num_locations):
             dist_mat.iloc[i, j] = spherical_dist(
-                [data.iloc[i, 2], data.iloc[i, 3]],  # latitude, longitude
-                [data.iloc[j, 2], data.iloc[j, 3]]
+                [data.iloc[i]['latitude'], data.iloc[i]['longitude']],  # latitude, longitude
+                [data.iloc[j]['latitude'], data.iloc[j]['longitude']]
             )
     return dist_mat
 
