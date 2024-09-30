@@ -118,9 +118,9 @@ def main():
 
     # Allow users to edit the data
     st.write("Input data:")
-    edited_data = st.data_editor(data, use_container_width=True, num_rows="dynamic")
-
-
+    #edited_data = st.data_editor(data, use_container_width=True, num_rows="dynamic")
+    edited_data = data
+    st.dataframe(edited_data.head(100))
     
 
 
@@ -140,10 +140,10 @@ def main():
     # Calculate distance matrix
     dist_mat = calculate_distances(edited_data)
     st.write("Calculated distance matrix:")
-    st.dataframe(dist_mat)
+    st.dataframe(dist_mat.head(100))
 
     # Select number of support centers and objective function
-    P = st.slider("Select number of support centers to be built", min_value=1, max_value=len(dist_mat) , value=3)
+    P = st.number_input("Select number of support centers to be built", min_value=1, max_value=len(dist_mat) , value=3)
     objective_type = st.selectbox(
         "Select objective function",
         options=['P-Median', 'K-Center', 'MCLP']
@@ -151,7 +151,7 @@ def main():
 
     # Allow the user to set the maximum coverage radius for MCLP
     if objective_type == 'MCLP':
-        r_max = st.slider("Select maximum coverage radius (miles)", min_value=1, max_value=int(dist_mat.max().max()), value=5)
+        r_max = st.number_input("Select maximum coverage radius (miles)", min_value=1, max_value=int(dist_mat.max().max()), value=5)
     else:
         r_max = None  # No need for r_max in other objective types
         
