@@ -146,7 +146,7 @@ def main():
     total_pages = (total_rows // page_size) + 1
     
     # Create a select box for pages
-    page = st.sidebar.number_input('Page', min_value=0, max_value=total_pages - 1, value=0, step=1)
+    page = st.number_input('Page', min_value=0, max_value=total_pages - 1, value=0, step=1)
     
     # Get data for the selected page
     paginated_data = get_paginated_data(data, page, page_size)
