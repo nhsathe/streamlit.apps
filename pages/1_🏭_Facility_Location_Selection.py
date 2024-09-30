@@ -113,49 +113,12 @@ def main():
     st.title("🏭 Facility Location Selection")
 
     # Load default data
-    #file = 'Database.csv'
-    #data = load_data(file)
+    file = 'Database.csv'
+    data = load_data(file)
 
     # Allow users to edit the data
-    #st.write("Input data:")
-    #edited_data = st.data_editor(data, use_container_width=True, num_rows="dynamic")
-
-
-
-    # Function to load data in chunks
-    @st.cache_data
-    def load_data_in_chunks(file, chunk_size=1000):
-        data = pd.read_csv(file, chunksize=chunk_size)
-        return pd.concat(data)
-    
-    # Pagination function
-    def get_paginated_data(data, page, page_size):
-        start_idx = page * page_size
-        end_idx = start_idx + page_size
-        return data.iloc[start_idx:end_idx]
-    
-    # File to be loaded
-    file = 'Database.csv'
-    
-    # Load data in chunks
-    data = load_data_in_chunks(file)
-    
-    # Pagination settings
-    page_size = 100  # Number of rows to display per page
-    total_rows = len(data)
-    total_pages = (total_rows // page_size) + 1
-    
-    # Create a select box for pages
-    page = st.number_input('Page', min_value=0, max_value=total_pages - 1, value=0, step=1)
-    
-    # Get data for the selected page
-    paginated_data = get_paginated_data(data, page, page_size)
-    
-    # Allow users to edit the paginated data
-    st.write(f"Displaying page {page + 1} of {total_pages}:")
-    edited_data = st.data_editor(paginated_data, use_container_width=True, num_rows="dynamic")
-
-
+    st.write("Input data:")
+    edited_data = st.data_editor(data, use_container_width=True, num_rows="dynamic")
 
 
     
