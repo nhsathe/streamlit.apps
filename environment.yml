@@ -8,4 +8,4 @@ dependencies:
   - pip
   - pulp
   - plotly
-  - coincbc
+  - coin-or-cbc
