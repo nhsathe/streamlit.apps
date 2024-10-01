@@ -1,6 +1,6 @@
 streamlit
 pyomo
 gurobipy
-coinor-cbc
+coin-or-cbc
 glpk
 plotly
