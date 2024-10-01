@@ -1,6 +1,0 @@
-streamlit
-pyomo
-gurobipy
-coin-or-cbc
-glpk
-plotly
