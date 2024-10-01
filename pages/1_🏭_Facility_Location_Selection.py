@@ -105,18 +105,33 @@ def main():
     data = load_data(file)
 
     # Check column names for compatibility
-    required_columns = ['zip_code', 'population', 'latitude', 'longitude']
+    required_columns = ['zip_code', 'population', 'latitude', 'longitude', 'state_name']
     if not all(col in data.columns for col in required_columns):
-        st.error("CSV file must contain 'zip_code', 'population', 'latitude' and 'longitude' columns.")
+        st.error("CSV file must contain 'zip_code', 'population', 'latitude', 'longitude', and 'state_name' columns.")
         return
 
+    # Display loaded data
+    st.write("Loaded data:")
+    st.dataframe(data)
+
+    # Filter data by state
+    state_names = data['state_name'].unique()
+    selected_state = st.selectbox("Select a state", state_names)
+    filtered_data = data[data['state_name'] == selected_state]
+
+    # Show filtered data
+    st.write(f"Input data for state: {selected_state}")
+    st.dataframe(filtered_data)
+
     # Convert filtered DataFrame to lists for optimization model
-    Zipcode1 = data['zip_code'].tolist()
-    population = data['population'].tolist()
+    Zipcode1 = filtered_data['zip_code'].tolist()
+    population = filtered_data['population'].tolist()
 
-    # Calculate distance matrix
-    dist_mat = calculate_distances(data)
-
+    # Calculate distance matrix for filtered data
+    dist_mat = calculate_distances(filtered_data)
+    st.write(f"Calculated distances for state: {selected_state}")
+    st.dataframe(dist_mat)
+    
     # Select number of support centers and objective function
     P = st.number_input("Select number of support centers to be built", min_value=1, max_value=len(dist_mat), value=3)
     objective_type = st.selectbox(
@@ -129,7 +144,7 @@ def main():
         r_max = st.number_input("Select maximum coverage radius (miles)", min_value=1, max_value=int(dist_mat.max().max()), value=5)
     else:
         r_max = None  # No need for r_max in other objective types
-        
+
     # Run the model
     if st.button("Run Model"):
         model = create_model(dist_mat, population, P, objective_type, r_max)
@@ -162,7 +177,7 @@ def main():
         st.dataframe(assignment_df)
 
         # Prepare data for visualization
-        result_data = data[data['zip_code'].isin(support_centers)]
+        result_data = filtered_data[filtered_data['zip_code'].isin(support_centers)]
         
         fig = go.Figure()
 
@@ -178,7 +193,7 @@ def main():
         ))
 
         # Add scatter points for other locations
-        other_data = data[~data['zip_code'].isin(support_centers)]
+        other_data = filtered_data[~filtered_data['zip_code'].isin(support_centers)]
         
         fig.add_trace(go.Scattermapbox(
             lat=other_data['latitude'],
@@ -192,9 +207,9 @@ def main():
 
         # Add arcs connecting locations to their assigned support centers
         for sc, locs in assignments.items():
-            sc_lat, sc_lon = data[data['zip_code'] == sc][['latitude', 'longitude']].values[0]
+            sc_lat, sc_lon = filtered_data[filtered_data['zip_code'] == sc][['latitude', 'longitude']].values[0]
             for loc in locs:
-                loc_lat, loc_lon = data[data['zip_code'] == loc][['latitude', 'longitude']].values[0]
+                loc_lat, loc_lon = filtered_data[filtered_data['zip_code'] == loc][['latitude', 'longitude']].values[0]
                 distance = spherical_dist_matrix(np.array([[sc_lat, sc_lon], [loc_lat, loc_lon]]))
                 fig.add_trace(go.Scattermapbox(
                     lat=[sc_lat, loc_lat],
@@ -205,8 +220,8 @@ def main():
                 ))
 
         # Set the map center and layout
-        average_lat = data['latitude'].mean()
-        average_lon = data['longitude'].mean()
+        average_lat = filtered_data['latitude'].mean()
+        average_lon = filtered_data['longitude'].mean()
         fig.update_layout(
             mapbox_style="open-street-map",
             height=800,
