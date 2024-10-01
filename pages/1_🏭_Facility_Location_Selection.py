@@ -218,14 +218,15 @@ def main():
             sc_lat, sc_lon = filtered_data[filtered_data['zip_code'] == sc][['latitude', 'longitude']].values[0]
             for loc in locs:
                 loc_lat, loc_lon = filtered_data[filtered_data['zip_code'] == loc][['latitude', 'longitude']].values[0]
-                distance = spherical_dist_matrix(np.array([[sc_lat, sc_lon], [loc_lat, loc_lon]]))
+                distance = spherical_dist(np.array([sc_lat, sc_lon]), np.array([loc_lat, loc_lon]))  # Corrected function call
                 fig.add_trace(go.Scattermapbox(
                     lat=[sc_lat, loc_lat],
                     lon=[sc_lon, loc_lon],
                     mode='lines',
                     line=dict(width=2, color='green'),
-                    name=f'Distance: {distance[0, 1]:.2f} miles'
+                    name=f'Distance: {distance:.2f} miles'
                 ))
+
 
         fig.update_layout(
             mapbox_style="carto-positron",
