@@ -12,35 +12,36 @@ import numpy as np
 import streamlit as st
 import plotly.graph_objects as go
 
-# Function to calculate spherical distance matrix using the Haversine formula
-def spherical_dist_matrix(positions, r=3958.75):  # r is the Earth's radius in miles
-    positions = np.radians(positions)  # Convert degrees to radians
 
-    # Extract latitude and longitude
-    lat1, lon1 = np.meshgrid(positions[:, 0], positions[:, 0], indexing='ij')
-    lat2, lon2 = np.meshgrid(positions[:, 1], positions[:, 1], indexing='ij')
 
-    # Calculate deltas
-    dlat = lat2 - lat1
-    dlon = lon2 - lon1
-
-    # Haversine formula
-    a = np.sin(dlat / 2) ** 2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon / 2) ** 2
-    c = 2 * np.arcsin(np.sqrt(a))
-
-    # Return distance matrix (multiply by Earth's radius in miles)
-    return r * c
+# Function to calculate spherical distance
+def spherical_dist(pos1, pos2, r=3958.75):
+    pos1 = np.array(pos1, dtype=float)
+    pos2 = np.array(pos2, dtype=float)
+    pos1 = pos1 * np.pi / 180
+    pos2 = pos2 * np.pi / 180
+    cos_lat1 = np.cos(pos1[..., 0])
+    cos_lat2 = np.cos(pos2[..., 0])
+    cos_lat_d = np.cos(pos1[..., 0] - pos2[..., 0])
+    cos_lon_d = np.cos(pos1[..., 1] - pos2[..., 1])
+    return r * np.arccos(cos_lat_d - cos_lat1 * cos_lat2 * (1 - cos_lon_d))
 
 # Load and preprocess data
 def load_data(file):
     data = pd.read_csv(file)
     return data
 
-# Calculate distance matrix
 def calculate_distances(data):
-    coordinates = data[['latitude', 'longitude']].to_numpy()
-    dist_mat = spherical_dist_matrix(coordinates)
-    return pd.DataFrame(dist_mat, index=data['zip_code'], columns=data['zip_code'])
+    num_locations = len(data)
+    dist_mat = pd.DataFrame(0, index=data['zip_code'], columns=data['zip_code'])
+    for i in range(num_locations):
+        for j in range(num_locations):
+            dist_mat.iloc[i, j] = spherical_dist(
+                [data.iloc[i]['latitude'], data.iloc[i]['longitude']],  # latitude, longitude
+                [data.iloc[j]['latitude'], data.iloc[j]['longitude']]
+            )
+    return dist_mat
+
 
 def create_model(distances, population, P, objective_type, r_max=None):    
     num_locations = len(distances)
