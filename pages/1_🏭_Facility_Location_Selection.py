@@ -12,24 +12,31 @@ import numpy as np
 import streamlit as st
 import plotly.graph_objects as go
 
-# Function to calculate spherical distance matrix using vectorization
-def spherical_dist_matrix(positions, r=3958.75):
-    positions = np.radians(positions)  # Convert to radians
+# Function to calculate spherical distance matrix using the Haversine formula
+def spherical_dist_matrix(positions, r=3958.75):  # r is the Earth's radius in miles
+    positions = np.radians(positions)  # Convert degrees to radians
+
+    # Extract latitude and longitude
     lat1, lon1 = np.meshgrid(positions[:, 0], positions[:, 0], indexing='ij')
     lat2, lon2 = np.meshgrid(positions[:, 1], positions[:, 1], indexing='ij')
 
-    cos_lat1 = np.cos(lat1)
-    cos_lat2 = np.cos(lat2)
-    cos_lat_d = np.cos(lat1 - lat2)
-    cos_lon_d = np.cos(lon1 - lon2)
+    # Calculate deltas
+    dlat = lat2 - lat1
+    dlon = lon2 - lon1
 
-    return r * np.arccos(cos_lat_d - cos_lat1 * cos_lat2 * (1 - cos_lon_d))
+    # Haversine formula
+    a = np.sin(dlat / 2) ** 2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon / 2) ** 2
+    c = 2 * np.arcsin(np.sqrt(a))
+
+    # Return distance matrix (multiply by Earth's radius in miles)
+    return r * c
 
 # Load and preprocess data
 def load_data(file):
     data = pd.read_csv(file)
     return data
 
+# Calculate distance matrix
 def calculate_distances(data):
     coordinates = data[['latitude', 'longitude']].to_numpy()
     dist_mat = spherical_dist_matrix(coordinates)
@@ -215,23 +222,18 @@ def main():
                     lat=[sc_lat, loc_lat],
                     lon=[sc_lon, loc_lon],
                     mode='lines',
-                    line=dict(width=1, color='black'),
+                    line=dict(width=2, color='green'),
                     name=f'Distance: {distance[0, 1]:.2f} miles'
                 ))
 
-        # Set the map center and layout
-        average_lat = filtered_data['latitude'].mean()
-        average_lon = filtered_data['longitude'].mean()
         fig.update_layout(
-            mapbox_style="open-street-map",
-            height=800,
-            title="Location Assignments and Costs",
-            mapbox=dict(center=dict(lat=average_lat, lon=average_lon), zoom=10),
-            showlegend=True
+            mapbox_style="carto-positron",
+            mapbox_zoom=5,
+            mapbox_center={"lat": filtered_data['latitude'].mean(), "lon": filtered_data['longitude'].mean()},
+            margin={"r":0,"t":0,"l":0,"b":0}
         )
 
-        # Show map
         st.plotly_chart(fig)
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
