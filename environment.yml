@@ -1,6 +1,7 @@
 name: pyomo_env
 channels:
   - conda-forge
+  - defaults
 dependencies:
   - python=3.9
   - pyomo
@@ -9,3 +10,7 @@ dependencies:
   - pulp
   - plotly
   - coinor-cbc
+  - conda-libmamba-solver
+  - libarchive
+  - pip:
+    - streamlit
