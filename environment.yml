@@ -14,4 +14,4 @@ dependencies:
   - libarchive
   - pip:
     - streamlit
-    - highs
+    - highspy
