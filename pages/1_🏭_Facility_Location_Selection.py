@@ -158,6 +158,12 @@ def main():
         model = create_model(dist_mat, population, P, objective_type, r_max)
         solver = pyo.SolverFactory('highs')
 
+        
+        if solver.available():
+            print("HiGHS is installed and available!")
+        else:
+            print("HiGHS solver is not available.")
+
         # Ensure the solver is correctly applied
         results = solver.solve(model, tee=True)
 
