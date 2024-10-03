@@ -156,8 +156,12 @@ def main():
     # Run the model
     if st.button("Run Model"):
         model = create_model(dist_mat, population, P, objective_type, r_max)
-        solver = pyo.SolverFactory('highs')
-
+        #solver = pyo.SolverFactory('highs')
+        try:
+            solver = pyo.SolverFactory('highs')
+            #results = solver.solve(model)
+        except Exception as e:
+             st.exception(e)
         
         
 
