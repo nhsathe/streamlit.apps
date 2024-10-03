@@ -10,6 +10,7 @@ dependencies:
   - pulp
   - plotly
   - coinor-cbc
+  - highs
   - conda-libmamba-solver
   - libarchive
   - pip:
