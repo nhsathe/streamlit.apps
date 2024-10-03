@@ -9,7 +9,6 @@ dependencies:
   - pip
   - pulp
   - plotly
-  - highspy
   - conda-libmamba-solver
   - libarchive
   - pip:
