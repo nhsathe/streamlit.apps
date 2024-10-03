@@ -159,10 +159,7 @@ def main():
         solver = pyo.SolverFactory('highs')
 
         
-        if solver.available():
-            st.write("HiGHS is installed and available!")
-        else:
-            st.write("HiGHS solver is not available.")
+        
 
         # Ensure the solver is correctly applied
         results = solver.solve(model, tee=True)
