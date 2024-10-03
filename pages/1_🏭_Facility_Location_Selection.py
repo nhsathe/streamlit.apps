@@ -160,9 +160,9 @@ def main():
 
         
         if solver.available():
-            print("HiGHS is installed and available!")
+            st.write("HiGHS is installed and available!")
         else:
-            print("HiGHS solver is not available.")
+            st.write("HiGHS solver is not available.")
 
         # Ensure the solver is correctly applied
         results = solver.solve(model, tee=True)
