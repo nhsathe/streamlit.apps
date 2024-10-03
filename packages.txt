@@ -1,2 +1,2 @@
 coinor-cbc
-highs
+highspy
