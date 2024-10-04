@@ -12,35 +12,40 @@ import numpy as np
 import streamlit as st
 import plotly.graph_objects as go
 import highspy
-
+from scipy.spatial.distance import pdist, squareform
 
 # Function to calculate spherical distance
 def spherical_dist(pos1, pos2, r=3958.75):
-    pos1 = np.array(pos1, dtype=float)
-    pos2 = np.array(pos2, dtype=float)
-    pos1 = pos1 * np.pi / 180
-    pos2 = pos2 * np.pi / 180
-    cos_lat1 = np.cos(pos1[..., 0])
-    cos_lat2 = np.cos(pos2[..., 0])
-    cos_lat_d = np.cos(pos1[..., 0] - pos2[..., 0])
-    cos_lon_d = np.cos(pos1[..., 1] - pos2[..., 1])
+    # Convert degrees to radians
+    lat1, lon1 = np.radians(pos1)
+    lat2, lon2 = np.radians(pos2)
+    
+    # Haversine formula components
+    cos_lat1 = np.cos(lat1)
+    cos_lat2 = np.cos(lat2)
+    cos_lat_d = np.cos(lat1 - lat2)
+    cos_lon_d = np.cos(lon1 - lon2)
+    
+    # Spherical distance formula
     return r * np.arccos(cos_lat_d - cos_lat1 * cos_lat2 * (1 - cos_lon_d))
-
+    
 # Load and preprocess data
 def load_data(file):
     data = pd.read_csv(file)
     return data
 
 def calculate_distances(data):
-    num_locations = len(data)
-    dist_mat = pd.DataFrame(0, index=data['zip_code'], columns=data['zip_code'])
-    for i in range(num_locations):
-        for j in range(num_locations):
-            dist_mat.iloc[i, j] = spherical_dist(
-                [data.iloc[i]['latitude'], data.iloc[i]['longitude']],  # latitude, longitude
-                [data.iloc[j]['latitude'], data.iloc[j]['longitude']]
-            )
-    return dist_mat
+    # Extract latitude and longitude from data
+    positions = data[['latitude', 'longitude']].values
+
+    # Compute the pairwise distances using pdist with the custom spherical distance function
+    dist_condensed = pdist(positions, lambda u, v: spherical_dist(u, v))
+    
+    # Convert the condensed distance matrix to a square form
+    dist_mat = squareform(dist_condensed)
+
+    # Create a DataFrame with zip_code as the index and columns
+    return pd.DataFrame(dist_mat, index=data['zip_code'], columns=data['zip_code'])
 
 
 def create_model(distances, population, P, objective_type, r_max=None):    
