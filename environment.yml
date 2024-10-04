@@ -9,6 +9,7 @@ dependencies:
   - pip
   - pulp
   - plotly
+  - scipy
   - conda-libmamba-solver
   - libarchive
   - pip:
