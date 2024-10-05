@@ -23,7 +23,7 @@ import highspy
 from scipy.spatial.distance import pdist, squareform
 
 
-highs_path = shutil.which('highs')
+highs_path = shutil.which('highspy')
 if highs_path:
     st.write(f"HiGHS is located at: {highs_path}")
 else:
