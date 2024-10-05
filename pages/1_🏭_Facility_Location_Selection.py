@@ -5,14 +5,6 @@ Created on Sun Sep 16 2024
 @author: Nishank
 """
 
-import shutil
-
-
-
-
-
-
-
 import pyomo.environ as pyo
 from pyomo.environ import *
 import pandas as pd
@@ -21,14 +13,6 @@ import streamlit as st
 import plotly.graph_objects as go
 import highspy
 from scipy.spatial.distance import pdist, squareform
-
-
-highs_path = shutil.which('highspy')
-if highs_path:
-    st.write(f"HiGHS is located at: {highs_path}")
-else:
-    st.write("HiGHS is not found in the system PATH.")
-
 
 
 
@@ -179,8 +163,8 @@ def main():
     # Run the model
     if st.button("Run Model"):
         model = create_model(dist_mat, population, P, objective_type, r_max)
-        solver = pyo.SolverFactory('cbc')
-        
+        #solver = pyo.SolverFactory('cbc')
+        solver = pyo.SolverFactory('highs', solver_io='python')
         
 
         # Ensure the solver is correctly applied
