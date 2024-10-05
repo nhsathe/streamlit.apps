@@ -14,6 +14,7 @@ import plotly.graph_objects as go
 import highspy
 from scipy.spatial.distance import pdist, squareform
 from pyomo.contrib.appsi.solvers import Highs
+from pyomo.opt import SolverFactory
 
 import pkg_resources
 highspy_version = pkg_resources.get_distribution("highspy").version
