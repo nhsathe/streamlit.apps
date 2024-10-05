@@ -7,11 +7,7 @@ Created on Sun Sep 16 2024
 
 import shutil
 
-highs_path = shutil.which('highs')
-if highs_path:
-    st.write(f"HiGHS is located at: {highs_path}")
-else:
-    st.write("HiGHS is not found in the system PATH.")
+
 
 
 
@@ -25,6 +21,16 @@ import streamlit as st
 import plotly.graph_objects as go
 import highspy
 from scipy.spatial.distance import pdist, squareform
+
+
+highs_path = shutil.which('highs')
+if highs_path:
+    st.write(f"HiGHS is located at: {highs_path}")
+else:
+    st.write("HiGHS is not found in the system PATH.")
+
+
+
 
 # Function to calculate spherical distance
 def spherical_dist(pos1, pos2, r=3958.75):
