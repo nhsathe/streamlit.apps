@@ -5,6 +5,16 @@ Created on Sun Sep 16 2024
 @author: Nishank
 """
 
+import os
+
+env_bin_path = os.path.join(os.environ['CONDA_PREFIX'], 'bin')
+binaries = os.listdir(env_bin_path)
+st.write(binaries)
+
+
+
+
+
 import pyomo.environ as pyo
 from pyomo.environ import *
 import pandas as pd
