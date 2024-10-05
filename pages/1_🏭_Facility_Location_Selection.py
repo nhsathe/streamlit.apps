@@ -5,11 +5,13 @@ Created on Sun Sep 16 2024
 @author: Nishank
 """
 
-import os
+import shutil
 
-env_bin_path = os.path.join(os.environ['CONDA_PREFIX'], 'bin')
-binaries = os.listdir(env_bin_path)
-st.write(binaries)
+highs_path = shutil.which('highs')
+if highs_path:
+    st.write(f"HiGHS is located at: {highs_path}")
+else:
+    st.write("HiGHS is not found in the system PATH.")
 
 
 
