@@ -10,7 +10,7 @@ dependencies:
   - pulp
   - plotly
   - scipy
-  - highs
+  - numpy
   - conda-libmamba-solver
   - libarchive
   - pip:
