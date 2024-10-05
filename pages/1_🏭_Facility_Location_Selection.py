@@ -13,6 +13,7 @@ import streamlit as st
 import plotly.graph_objects as go
 import highspy
 from scipy.spatial.distance import pdist, squareform
+st.write(highspy.__version__)
 
 
 
