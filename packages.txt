@@ -1,5 +1,4 @@
 coinor-cbc
-libhighs-dev
-libhighs-utils
+
 
 
