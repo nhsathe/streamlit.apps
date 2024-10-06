@@ -14,6 +14,8 @@ import plotly.graph_objects as go
 import highspy
 from scipy.spatial.distance import pdist, squareform
 
+import os
+os.environ['GRB_LICENSE_FILE'] = '/bin/gurobi.lic'
 
 
 
@@ -165,9 +167,9 @@ def main():
     # Run the model
     if st.button("Run Model"):
         model = create_model(dist_mat, population, P, objective_type, r_max)
-        solver = pyo.SolverFactory('cbc')
+        #solver = pyo.SolverFactory('cbc')
         #solver = pyo.SolverFactory('highs')
-        
+        solver = pyo.SolverFactory('gurobi')
 
         # Ensure the solver is correctly applied
         results = solver.solve(model, tee=True)
