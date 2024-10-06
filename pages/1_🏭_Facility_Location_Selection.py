@@ -14,8 +14,7 @@ import plotly.graph_objects as go
 import highspy
 from scipy.spatial.distance import pdist, squareform
 
-import os
-os.chmod('/mount/src/streamlit.apps/bin/highs', 0o755)  # Set executable permissions if needed
+
 
 
 
