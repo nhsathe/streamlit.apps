@@ -165,7 +165,7 @@ def main():
     if st.button("Run Model"):
         model = create_model(dist_mat, population, P, objective_type, r_max)
         #solver = pyo.SolverFactory('cbc')
-        solver = pyo.SolverFactory('highs', executable='bin/highs')
+        solver = pyo.SolverFactory('highs', executable='/mount/src/streamlit.apps/bin/highs')
         
 
         # Ensure the solver is correctly applied
