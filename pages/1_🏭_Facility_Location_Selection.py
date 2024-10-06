@@ -13,8 +13,7 @@ import streamlit as st
 import plotly.graph_objects as go
 import highspy
 from scipy.spatial.distance import pdist, squareform
-import os
-os.chmod('bin/highs', 0o755)  # Set the binary as executable
+
 
 
 
@@ -166,7 +165,7 @@ def main():
     if st.button("Run Model"):
         model = create_model(dist_mat, population, P, objective_type, r_max)
         #solver = pyo.SolverFactory('cbc')
-        solver = pyo.SolverFactory('highs', executable= 'bin/highs')
+        solver = pyo.SolverFactory('highs', solver_io='python')
         
 
         # Ensure the solver is correctly applied
