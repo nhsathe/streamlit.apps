@@ -15,7 +15,7 @@ import highspy
 from scipy.spatial.distance import pdist, squareform
 
 import os
-os.environ['GRB_LICENSE_FILE'] = '/bin/gurobi.lic'
+os.environ['GRB_LICENSE_FILE'] = '/mount/src/streamlit.apps/bin/gurobi.lic'
 
 
 
