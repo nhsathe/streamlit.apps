@@ -197,40 +197,59 @@ def main():
         assignment_df = pd.DataFrame([(k, v) for k, vals in assignments.items() for v in vals], columns=['Support Center', 'Locations served'])
         st.dataframe(assignment_df)
 
-        # Prepare data for visualization
-        result_data = filtered_data[filtered_data['zip_code'].isin(support_centers)]
-        
-        fig = go.Figure()
+      
 
+        # Prepare data for visualization
+        zip_codes = filtered_data['zip_code'].values
+        support_centers_set = set(support_centers)  # Convert to set for O(1) lookups
+        
+        # Create lists to hold latitude and longitude for both types of locations
+        support_centers_lat = []
+        support_centers_lon = []
+        other_locations_lat = []
+        other_locations_lon = []
+        other_hovertext = []
+        
+        # Loop through the filtered data only once
+        for index, row in filtered_data.iterrows():
+            if row['zip_code'] in support_centers_set:
+                support_centers_lat.append(row['latitude'])
+                support_centers_lon.append(row['longitude'])
+            else:
+                other_locations_lat.append(row['latitude'])
+                other_locations_lon.append(row['longitude'])
+                other_hovertext.append(str(row['zip_code']))
+        
+        # Create the figure
+        fig = go.Figure()
+        
         # Add scatter points for support centers
         fig.add_trace(go.Scattermapbox(
-            lat=result_data['latitude'],
-            lon=result_data['longitude'],
+            lat=support_centers_lat,
+            lon=support_centers_lon,
             mode='markers',
             marker=dict(size=10, color='blue'),
-            hovertext=result_data['zip_code'].astype(str),
+            hovertext=list(support_centers),
             hoverinfo='text',
             name='Support Centers'
         ))
-
-        # Add scatter points for other locations
-        other_data = filtered_data[~filtered_data['zip_code'].isin(support_centers)]
         
+        # Add scatter points for other locations
         fig.add_trace(go.Scattermapbox(
-            lat=other_data['latitude'],
-            lon=other_data['longitude'],
+            lat=other_locations_lat,
+            lon=other_locations_lon,
             mode='markers',
             marker=dict(size=8, color='red'),
-            hovertext=other_data['zip_code'],
+            hovertext=other_hovertext,
             hoverinfo='text',
             name='Served Locations'
         ))
-
-        # Add arcs connecting locations to their assigned support centers
+        
+        # Prepare to add arcs connecting locations to their assigned support centers
         for sc, locs in assignments.items():
-            sc_lat, sc_lon = filtered_data[filtered_data['zip_code'] == sc][['latitude', 'longitude']].values[0]
+            sc_lat, sc_lon = filtered_data.loc[filtered_data['zip_code'] == sc, ['latitude', 'longitude']].values[0]
             for loc in locs:
-                loc_lat, loc_lon = filtered_data[filtered_data['zip_code'] == loc][['latitude', 'longitude']].values[0]
+                loc_lat, loc_lon = filtered_data.loc[filtered_data['zip_code'] == loc, ['latitude', 'longitude']].values[0]
                 distance = spherical_dist(np.array([sc_lat, sc_lon]), np.array([loc_lat, loc_lon]))  # Corrected function call
                 fig.add_trace(go.Scattermapbox(
                     lat=[sc_lat, loc_lat],
@@ -239,16 +258,17 @@ def main():
                     line=dict(width=2, color='green'),
                     name=f'Distance: {distance:.2f} miles'
                 ))
-
-
+        
+        # Update layout
         fig.update_layout(
             mapbox_style="carto-positron",
             mapbox_zoom=5,
             mapbox_center={"lat": filtered_data['latitude'].mean(), "lon": filtered_data['longitude'].mean()},
-            margin={"r":0,"t":0,"l":0,"b":0}
+            margin={"r": 0, "t": 0, "l": 0, "b": 0}
         )
-
+        
         st.plotly_chart(fig)
+
 
 if __name__ == '__main__':
     main()
