@@ -171,7 +171,7 @@ def main():
         #solver = pyo.SolverFactory('highs')
         solver = pyo.SolverFactory('gurobi')
 
-        solver.options['Heuristics'] = 0.1
+        solver.options['Heuristics'] = 0.5
         solver.options['MIPFocus'] = 1
         solver.options['Cuts'] = 2
 
