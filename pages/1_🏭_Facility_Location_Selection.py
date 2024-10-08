@@ -173,7 +173,7 @@ def main():
 
         solver.options['Heuristics'] = 0.8
         solver.options['MIPFocus'] = 1
-        solver.options['Cuts'] = 4
+        
 
         # Ensure the solver is correctly applied
         results = solver.solve(model, tee=True)
