@@ -13,6 +13,7 @@ dependencies:
   - numpy
   - conda-libmamba-solver
   - libarchive
+  - altair=4.2.2
   - pip:
     - streamlit
     - highspy
